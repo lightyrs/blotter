@@ -34,7 +34,7 @@ In config/routes.rb:
 
     blotter_for [:facebook_page, :giveaway]
 
-The first symbol is the resource that has the page's facebook pid.
+The first symbol is the resource that has the page's facebook pid.  
 The second symbol is the resource that will be used to build the view.
 
 By default, this will create a route that is equivalent to:
