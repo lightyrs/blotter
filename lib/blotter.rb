@@ -46,7 +46,7 @@ module Blotter
     end
 
     def expected_source?
-      @request.source.match /facebook\.com$/
+      @request.env && @request.env['HTTP_ORIGIN'].match(/facebook\.com$/)
     end
 
     def expected_params?

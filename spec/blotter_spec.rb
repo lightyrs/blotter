@@ -8,7 +8,9 @@ describe Blotter do
     OpenStruct.new(
       method: "POST",
       ip: "127.0.0.1",
-      source: "http://apps.facebook.com",
+      env: {
+        "HTTP_ORIGIN" => "http://apps.facebook.com"
+      },
       referrer: "http://apps.facebook.com/_sg_dev/?fb_source=search&ref=ts&fref=ts",
       params: {
         "signed_request" => "gibberish",
@@ -24,7 +26,7 @@ describe Blotter do
   }
 
   let(:bad_source_request) {
-    request.clone.tap { |r| r.source = "http://apps.twitter.com" }
+    request.clone.tap { |r| r.env["HTTP_ORIGIN"] = "http://apps.twitter.com" }
   }
 
   let(:bad_params_request) {
