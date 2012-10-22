@@ -80,9 +80,11 @@ To override these defaults (as most of you will probably require):
 
     end
 
-Given this config, all tab request will be redirected to a subdirectory within
+Given this configuration, all tab requests will be redirected to a subdirectory within
 '/tab'.  For example, a bitly link pointing to the tab URL will be redirected to
-'/tab/bitly'.  In the canvas example, all requests to the canvas URL that are not
+'/tab/bitly'.  
+
+In the canvas example, all requests to the canvas URL that are not
 explicitly configured here will be redirected to '/canvas/[referral type]'.  Any
 request that has an explicit configuration will be redirected to the specified
 route.  For example, a request to the canvas URL originating from a Facebook
@@ -92,8 +94,7 @@ to '/appcenter' because it has been explicitly defined.
 
 By the time the relevant controller action recieves the redirected request,
 you will have access to the Facebook Page resource for which the request
-is intended as well as the resource that will be used to render the
-requested view.
+is intended, which should make it easy to retrieve the page's active resource that will be used to compose the view.
 
 ## Practical Example
 
@@ -121,18 +122,49 @@ Given this configuration, all requests to my application's tab and canvas URLs w
 
 Imagine that a Facebook user clicks an app request notification sent by a giveaway entrant. Facebook will route this request to the canvas URL you set at [facebook.com/developer](http://facebook.com/developer). I have mine set to the default `blotter_for` route:
 
-	Tab URL: http://simplegiveaways.com/blotter/
-	Secure Tab URL: https://simplegiveaways.com/blotter/
-	
 	Canvas URL: http://simplegiveaways.com/blotter/
 	Secure Canvas URL: https://simplegiveaways.com/blotter/
 	
-When the request hits the Rails app, blotter does the following:
+	Tab URL: http://simplegiveaways.com/blotter/
+	Secure Tab URL: https://simplegiveaways.com/blotter/
+	
+When the request hits the Rails app, it is routed to `BlotterController#index`.  
+This action does the following:
 
   1. Determines the referral type of the request.
-  2. Parses the signed request.
-  3. Builds a visitor object.
-  4. Redirects to the appropriate route.
+  
+  2. Parses any cookies previously set by blotter.
+  
+  3. Parses the signed request.
+  
+  4. Builds a visitor object.
+  
+  5. Sets a cookie to remember the visitor.
+  
+  6. Copies the blotter object into the session.
+  
+  7. Redirects to the appropriate route.
+  
+Given my configuration, this request will be redirected to a subdirectory of my canvas root, '/giveaways'.  
+In this scenario, the request will be redirected to '/giveaways/notification'.
+
+Now let's imagine what this action might look like:
+
+    class GiveawaysController < ApplicationController
+    
+      before_filter :assign_blotter
+      
+      def notification
+      	@page = @blotter.facebook_page
+      	@resource = @page.active_resource
+      end
+      
+      private
+      
+      def assign_blotter
+      	@blotter ||= session.delete[:blotter]
+      end
+    end
 
 ## Dependencies
 
