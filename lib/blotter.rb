@@ -1,4 +1,4 @@
-require "blotter/version"
+require_relative 'blotter/version'
 
 module Blotter
 
@@ -52,5 +52,32 @@ module Blotter
     def expected_params?
       @request.params['signed_request'].length > 0
     end
+  end
+
+  class Visitor
+
+  end
+
+  class Page
+
+  end
+
+  class Art
+
+    def initialize(page, visitor)
+      @page, @visitor = page, visitor
+      raise ArgumentError if bad_args?
+    end
+
+    private
+
+    def bad_args?
+      true unless @page.is_a? Blotter::Page and @visitor.is_a? Blotter::Visitor
+    end
+  end
+
+  class Cookie
+
+
   end
 end

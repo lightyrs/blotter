@@ -1,1 +1,1 @@
-require 'blotter'
+require_relative '../lib/blotter'
