@@ -1,12 +1,12 @@
-# encoding: utf-8
-require_relative '../spec/spec_helper'
-require 'ostruct'
+require 'spec_helper'
 
 describe Blotter do
 
   before do
+
     Blotter.register_blotter_model(FacebookPage)
     Blotter.register_blotter_method(:active_giveaway)
+
     stub(Blotter.blotter_model).columns {[
       OpenStruct.new(type: :string, name: 'pid'),
       OpenStruct.new(type: :integer, name: 'id'),
@@ -36,14 +36,6 @@ describe Blotter do
     )
   }
 
-  let(:bad_source_request) {
-    request.clone.tap { |r| r.env["HTTP_ORIGIN"] = "http://apps.twitter.com" }
-  }
-
-  let(:bad_params_request) {
-    request.clone.tap { |r| r.params.delete("signed_request") }
-  }
-
   let(:blotter_instance) { Blotter.new(request) }
 
   describe ".new" do
@@ -55,6 +47,14 @@ describe Blotter do
   end
 
   describe Blotter::Core do
+
+    let(:bad_source_request) {
+      request.clone.tap { |r| r.env["HTTP_ORIGIN"] = "http://apps.twitter.com" }
+    }
+
+    let(:bad_params_request) {
+      request.clone.tap { |r| r.params.delete("signed_request") }
+    }
 
     describe "#initialize" do
 
@@ -135,14 +135,19 @@ describe Blotter do
 
   describe Blotter::Page do
 
+    let(:pid) { '1234' }
+
     describe "#initialize" do
 
       it "takes a facebook page id as a required argument" do
-
+        expect { Blotter::Page.new }.to raise_error ArgumentError
+        expect { Blotter::Page.new(request) }.to raise_error ArgumentError
+        expect { Blotter::Page.new(pid) }.to_not raise_error
       end
 
       it "assigns the facebook page id to an instance variable" do
-
+        blotter_page_instance = Blotter::Page.new(pid)
+        blotter_page_instance.instance_eval { @pid }.should == pid
       end
 
       it "returns an instance of the blotter model with the provided pid" do
@@ -151,42 +156,28 @@ describe Blotter do
     end
   end
 
-  describe Blotter::Art do
+  describe Blotter::View do
 
-    let(:page) { 'Blotter::Page' }
-    let(:visitor) { 'Blotter::Visitor' }
+    let(:page) { FacebookPage.new }
 
     before do
       stub(page).is_a? { true }
-      stub(visitor).is_a? { true }
     end
 
     describe "#initialize" do
 
-      it "takes a Blotter::Page and Blotter::Visitor as required arguments" do
-        expect { Blotter::Art.new }.to raise_error ArgumentError
-        expect { Blotter::Art.new(request, 2) }.to raise_error ArgumentError
-        expect { Blotter::Art.new(page, visitor) }.to_not raise_error
+      it "takes a Blotter::Page as a required argument" do
+        expect { Blotter::View.new }.to raise_error ArgumentError
+        expect { Blotter::View.new(request) }.to raise_error ArgumentError
+        expect { Blotter::View.new(page) }.to_not raise_error
       end
 
-      it "assigns the page and visitor arguments to instance variables" do
-        blotter_art_instance = Blotter::Art.new(page, visitor)
-        blotter_art_instance.instance_eval { @page }.should == page
-        blotter_art_instance.instance_eval { @visitor }.should == visitor
+      it "assigns the page argument to an instance variable" do
+        blotter_view_instance = Blotter::View.new(page)
+        blotter_view_instance.instance_eval { @page }.should == page
       end
     end
   end
-
-  # TODO
-  # How do we find the right cookie?  This would require prior knowledge of the
-  # active resource, which implies a method for retrieving the active resource
-  # from the discerned page that generated the request.
-  #
-  # Could have some macro like:
-  # blotter :active_giveaway
-  #
-  # This means, once we find the page, we call :active_giveaway on it to
-  # retrieve the active resource.
 
   describe Blotter::Cookie do
 

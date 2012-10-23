@@ -24,7 +24,7 @@ module Blotter
     end
 
     def view
-      @view ||= instance_eval "page.#{Blotter.blotter_method}"
+      @view ||= Blotter::View.new(page)
     end
 
     def page
@@ -80,10 +80,15 @@ module Blotter
 
     def initialize(pid)
       @pid = pid
+      raise ArgumentError if bad_args?
       matched_page_resource
     end
 
     private
+
+    def bad_args?
+      true unless @pid.is_a? String or @pid.is_a? Integer
+    end
 
     def matched_page_resource
       dirty_results = likely_pid_columns.map do |column_name|
@@ -113,17 +118,23 @@ module Blotter
     end
   end
 
-  class Art
+  class View
 
-    def initialize(page, visitor)
-      @page, @visitor = page, visitor
+    attr_accessor :resource
+
+    def initialize(page)
+      @page = page
       raise ArgumentError if bad_args?
     end
 
     private
 
+    def matched_view_resource
+      instance_eval "@page.#{Blotter.blotter_method}"
+    end
+
     def bad_args?
-      true unless @page.is_a? Blotter::Page and @visitor.is_a? Blotter::Visitor
+      true unless @page.is_a? Blotter::Page
     end
   end
 
