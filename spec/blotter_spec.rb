@@ -31,7 +31,9 @@ describe Blotter do
         "controller" => "blotter",
         "action" => "index"
       },
-      cookies: nil,
+      cookies: OpenStruct.new(signed: { "_blotter_000_1234_999" => {
+
+      }}),
       session: nil
     )
   }

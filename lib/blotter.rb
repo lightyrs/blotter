@@ -58,7 +58,7 @@ module Blotter
     private
 
     def parsed_request
-      @oauth ||= Koala::Facebook::OAuth.new(FB_APP_ID, FB_APP_SECRET)
+      @oauth ||= Koala::Facebook::OAuth.new(Blotter.app_id, Blotter.app_secret)
       @oauth.parse_signed_request(@request.params['signed_request'])
     end
 
@@ -173,7 +173,7 @@ module Blotter
     private
 
     def cookie_key
-      @cookie_key ||= "_blotter_#{options[:page_resource]
+      @cookie_key ||= "_blotter_#{Blotter.app_id}_#{options[:page_resource]
       .id}_#{options[:view_resource].id}"
     end
 
