@@ -1,4 +1,4 @@
-# blotter
+# blotter [![Build Status](https://secure.travis-ci.org/switchrails/blotter.png)](http://travis-ci.org/switchrails/blotter)
 
 **blotter** implements a basic router for Facebook page tab applications as well as
 some convenience methods that should come in handy for those deploying Facebook
