@@ -81,24 +81,54 @@ describe Blotter do
       end
     end
 
-    describe "#page" do
+    describe "#view" do
+
+      let(:page_resource) { FacebookPage.new(name: "cia") }
+      let(:blotter_view_instance) { OpenStruct.new(resource: 1) }
 
       before do
-        any_instance_of(Blotter::Core, :payload => {
+        any_instance_of(Blotter::Core, payload: {
+          'page' => { 'id' => '7' }
+        })
+        any_instance_of(Blotter::Page, resource: page_resource)
+      end
+
+      it "calls Blotter::View.new with the value of Blotter::Page#resource" do
+        mock(Blotter::View).new(page_resource) { blotter_view_instance }
+        blotter_instance.view
+      end
+
+      it "returns Blotter::View#resource" do
+        mock(Blotter::View).new(page_resource) { blotter_view_instance }
+        blotter_instance.view.should == 1
+      end
+    end
+
+    describe "#page" do
+
+      let(:blotter_page_instance) { OpenStruct.new(resource: 2) }
+
+      before do
+        any_instance_of(Blotter::Core, payload: {
           'page' => { 'id' => '7' }
         })
       end
 
       it "calls Blotter::Page.new with the page id from the signed request" do
-        mock(Blotter::Page).new('7') { 'facebook page resource' }
-        blotter_instance.page.should == 'facebook page resource'
+        mock(Blotter::Page).new('7') { blotter_page_instance }
+        blotter_instance.page
+      end
+
+      it "returns Blotter::Page#resource" do
+        mock(Blotter::Page).new('7') { blotter_page_instance }
+        blotter_instance.page.should == 2
       end
     end
 
     describe "#visitor" do
 
       before do
-        any_instance_of(Blotter::Core, :payload => {
+        any_instance_of(Blotter::Core, payload: {
           'user' => { 'data' => 'fake visitor data' },
           'user_id' => '808283'
         })
@@ -149,10 +179,13 @@ describe Blotter do
         blotter_page_instance = Blotter::Page.new(pid)
         blotter_page_instance.instance_eval { @pid }.should == pid
       end
+    end
 
-      xit "returns an instance of the blotter model with the provided pid" do
+    describe "#resource" do
+
+      it "returns an instance of the blotter model with the provided pid" do
         mock(FacebookPage).find_by_pid(1234) { 'ponies' }
-        Blotter::Page.new(pid).should == 'ponies'
+        Blotter::Page.new(pid).resource.should == 'ponies'
       end
     end
   end
@@ -177,10 +210,13 @@ describe Blotter do
         blotter_view_instance = Blotter::View.new(page)
         blotter_view_instance.instance_eval { @page }.should == page
       end
+    end
 
-      xit "returns the return value of the blotter_model's blotter_method" do
+    describe "#resource" do
+
+      it "returns the return value of the blotter_model's blotter_method" do
         mock(page).active_giveaway { 'ponies' }
-        Blotter::View.new(page).should == 'ponies'
+        Blotter::View.new(page).resource.should == 'ponies'
       end
     end
   end

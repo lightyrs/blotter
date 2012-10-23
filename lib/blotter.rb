@@ -25,10 +25,12 @@ module Blotter
 
     def view
       @view ||= Blotter::View.new(page)
+      @view.resource
     end
 
     def page
       @page ||= Blotter::Page.new(payload['page']['id'])
+      @page.resource
     end
 
     def visitor
@@ -81,6 +83,9 @@ module Blotter
     def initialize(pid)
       @pid = pid
       raise ArgumentError if bad_args?
+    end
+
+    def resource
       matched_page_resource
     end
 
@@ -120,11 +125,13 @@ module Blotter
 
   class View
 
-    attr_accessor :resource
-
     def initialize(page)
       @page = page
       raise ArgumentError if bad_args?
+    end
+
+    def resource
+      matched_view_resource
     end
 
     private
@@ -134,7 +141,7 @@ module Blotter
     end
 
     def bad_args?
-      true unless @page.is_a? Blotter::Page
+      true unless @page.is_a? Blotter.blotter_model
     end
   end
 
