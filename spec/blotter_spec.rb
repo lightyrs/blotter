@@ -140,6 +140,23 @@ describe Blotter do
       end
     end
 
+    describe "#outbound_cookie" do
+
+      let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
+
+      it "calls Blotter::Cookie.new with request cookies" do
+        mock(request).cookies { 'request_cookies' }
+        mock(Blotter::Cookie).new('request_cookies') { blotter_cookie_instance }
+        blotter_instance.outbound_cookie
+      end
+
+      it "returns the value of Blotter::Cookie#outbound" do
+        mock(request).cookies { 'request_cookies' }
+        mock(Blotter::Cookie).new('request_cookies') { blotter_cookie_instance }
+        blotter_instance.outbound_cookie.should == 4
+      end
+    end
+
     describe "#referral_type" do
 
       it "returns a string describing the nature of the referral" do

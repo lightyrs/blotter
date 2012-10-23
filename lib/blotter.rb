@@ -38,6 +38,11 @@ module Blotter
       visitor.merge!("uid" => payload['user_id']) if payload.has_key? 'user_id'
     end
 
+    def outbound_cookie
+      @cookie ||= Blotter::Cookie.new(@request.cookies)
+      @cookie.outbound
+    end
+
     def referral_type
       @request.params['fb_source']
     end
@@ -70,9 +75,25 @@ module Blotter
     end
   end
 
-  class Visitor
+  class View
 
-    def initialize
+    def initialize(page)
+      @page = page
+      raise ArgumentError if bad_args?
+    end
+
+    def resource
+      matched_view_resource
+    end
+
+    private
+
+    def matched_view_resource
+      instance_eval "@page.#{Blotter.blotter_method}"
+    end
+
+    def bad_args?
+      true unless @page.is_a? Blotter.blotter_model
     end
   end
 
@@ -123,25 +144,9 @@ module Blotter
     end
   end
 
-  class View
+  class Visitor
 
-    def initialize(page)
-      @page = page
-      raise ArgumentError if bad_args?
-    end
-
-    def resource
-      matched_view_resource
-    end
-
-    private
-
-    def matched_view_resource
-      instance_eval "@page.#{Blotter.blotter_method}"
-    end
-
-    def bad_args?
-      true unless @page.is_a? Blotter.blotter_model
+    def initialize
     end
   end
 
