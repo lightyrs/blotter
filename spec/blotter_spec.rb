@@ -173,10 +173,34 @@ describe Blotter do
     end
   end
 
-  describe Blotter::Visitor do
+  describe Blotter::View do
+
+    let(:page) { FacebookPage.new }
+
+    before do
+      stub(page).is_a? { true }
+    end
 
     describe "#initialize" do
 
+      it "takes a Blotter::Page as a required argument" do
+        expect { Blotter::View.new }.to raise_error ArgumentError
+        expect { Blotter::View.new(request) }.to raise_error ArgumentError
+        expect { Blotter::View.new(page) }.to_not raise_error
+      end
+
+      it "assigns the page argument to an instance variable" do
+        blotter_view_instance = Blotter::View.new(page)
+        blotter_view_instance.instance_eval { @page }.should == page
+      end
+    end
+
+    describe "#resource" do
+
+      it "returns the return value of the blotter_model's blotter_method" do
+        mock(page).active_giveaway { 'ponies' }
+        Blotter::View.new(page).resource.should == 'ponies'
+      end
     end
   end
 
@@ -207,34 +231,10 @@ describe Blotter do
     end
   end
 
-  describe Blotter::View do
-
-    let(:page) { FacebookPage.new }
-
-    before do
-      stub(page).is_a? { true }
-    end
+  describe Blotter::Visitor do
 
     describe "#initialize" do
 
-      it "takes a Blotter::Page as a required argument" do
-        expect { Blotter::View.new }.to raise_error ArgumentError
-        expect { Blotter::View.new(request) }.to raise_error ArgumentError
-        expect { Blotter::View.new(page) }.to_not raise_error
-      end
-
-      it "assigns the page argument to an instance variable" do
-        blotter_view_instance = Blotter::View.new(page)
-        blotter_view_instance.instance_eval { @page }.should == page
-      end
-    end
-
-    describe "#resource" do
-
-      it "returns the return value of the blotter_model's blotter_method" do
-        mock(page).active_giveaway { 'ponies' }
-        Blotter::View.new(page).resource.should == 'ponies'
-      end
     end
   end
 

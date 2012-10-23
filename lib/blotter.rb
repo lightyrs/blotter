@@ -39,7 +39,11 @@ module Blotter
     end
 
     def outbound_cookie
-      @cookie ||= Blotter::Cookie.new(@request.cookies)
+      @cookie ||= Blotter::Cookie.new(
+        request_cookies: @request.cookies,
+        page_resource: page,
+        view_resource: view
+      )
       @cookie.outbound
     end
 
@@ -152,7 +156,78 @@ module Blotter
 
   class Cookie
 
-    def initialize
+    attr_accessor :cookie_key
+
+    def initialize(options = {})
+      @options = options
+    end
+
+    def inbound
+      @inbound ||= @options[:request_cookies].signed[cookie_key]
+    end
+
+    def outbound
+      outbound_cookie_value
+    end
+
+    private
+
+    def cookie_key
+      @cookie_key ||= "_blotter_#{options[:page_resource]
+      .id}_#{options[:view_resource].id}"
+    end
+
+    def outbound_cookie_value
+
+      cookie_value = {}
+
+      cookie_value['visitor']['visit_count'] = visitor_visit_count
+      cookie_value['visitor']['first_visit'] = visitor_first_visit
+      cookie_value['visitor']['last_visit'] = visitor_last_visit
+      cookie_value['visitor']['this_visit'] = visitor_this_visit
+
+      cookie_value['visitor']['is_page_fan'] = visitor_is_page_fan?
+      cookie_value['visitor']['is_app_user'] = visitor_is_app_user?
+      cookie_value['visitor']['became_page_fan'] = visitor_became_page_fan?
+      cookie_value['visitor']['became_app_user'] = visitor_became_app_user?
+
+      cookie_value['visitor']['referred_by_ids'] = visitor_referred_by_ids
+    end
+
+    def visitor_visit_count
+      @inbound
+    end
+
+    def visitor_first_visit
+      @inbound
+    end
+
+    def visitor_last_visit
+      @inbound
+    end
+
+    def visitor_this_visit
+      @inbound
+    end
+
+    def visitor_is_page_fan?
+      @inbound
+    end
+
+    def visitor_is_app_user?
+      @inbound
+    end
+
+    def visitor_became_page_fan?
+      @inbound
+    end
+
+    def visitor_became_app_user?
+      @inbound
+    end
+
+    def visitor_referred_by_ids
+      @inbound
     end
   end
 end
