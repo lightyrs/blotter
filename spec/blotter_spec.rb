@@ -4,25 +4,35 @@ require 'ostruct'
 
 describe Blotter do
 
+  before do
+    Blotter.register_blotter_model(FacebookPage)
+    Blotter.register_blotter_method(:active_giveaway)
+    Blotter.blotter_model.stub(:columns).and_return([
+      OpenStruct.new(type: :string, name: 'pid'),
+      OpenStruct.new(type: :integer, name: 'id'),
+      OpenStruct.new(type: :boolean, name: 'page_id')
+    ])
+  end
+
   let(:request) {
 
     OpenStruct.new(
-        method: "POST",
-        ip: "127.0.0.1",
-        env: {
-            "HTTP_ORIGIN" => "http://apps.facebook.com"
-        },
-        referrer: "http://apps.facebook.com/_sg_dev/?fb_source=search&ref=ts&fref=ts",
-        params: {
-            "signed_request" => "gibberish",
-            "fb_source" => "search",
-            "ref" => "ts",
-            "fref" => "ts",
-            "controller" => "blotter",
-            "action" => "index"
-        },
-        cookies: nil,
-        session: nil
+      method: "POST",
+      ip: "127.0.0.1",
+      env: {
+        "HTTP_ORIGIN" => "http://apps.facebook.com"
+      },
+      referrer: "http://apps.facebook.com/_sg_dev/?fb_source=search&ref=ts&fref=ts",
+      params: {
+        "signed_request" => "gibberish",
+        "fb_source" => "search",
+        "ref" => "ts",
+        "fref" => "ts",
+        "controller" => "blotter",
+        "action" => "index"
+      },
+      cookies: nil,
+      session: nil
     )
   }
 
@@ -73,15 +83,12 @@ describe Blotter do
 
     describe "#page" do
 
-      let(:fake_page_data) { { 'page' => 'fake page data' } }
+      it "calls Blotter::Page.new with the page id from the signed request" do
 
-      before do
-        blotter_instance.stub(:payload).and_return fake_page_data
       end
 
-      it "returns page data from the parsed signed request" do
-        blotter_instance.should_receive(:payload)
-        blotter_instance.page.should == 'fake page data'
+      it "returns an instance of Blotter::Page" do
+
       end
     end
 
@@ -89,8 +96,8 @@ describe Blotter do
 
       let(:fake_visitor_data) {
         {
-            'user' => { 'data' => 'fake visitor data' },
-            'user_id' => '808283'
+          'user' => { 'data' => 'fake visitor data' },
+          'user_id' => '808283'
         }
       }
 
@@ -132,6 +139,17 @@ describe Blotter do
 
     describe "#initialize" do
 
+      it "takes a facebook page id as a required argument" do
+
+      end
+
+      it "assigns the facebook page id to an instance variable" do
+
+      end
+
+      it "returns an instance of the blotter model with the provided pid" do
+
+      end
     end
   end
 
