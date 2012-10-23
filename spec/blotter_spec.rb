@@ -150,8 +150,9 @@ describe Blotter do
         blotter_page_instance.instance_eval { @pid }.should == pid
       end
 
-      it "returns an instance of the blotter model with the provided pid" do
-
+      xit "returns an instance of the blotter model with the provided pid" do
+        mock(FacebookPage).find_by_pid(1234) { 'ponies' }
+        Blotter::Page.new(pid).should == 'ponies'
       end
     end
   end
@@ -175,6 +176,11 @@ describe Blotter do
       it "assigns the page argument to an instance variable" do
         blotter_view_instance = Blotter::View.new(page)
         blotter_view_instance.instance_eval { @page }.should == page
+      end
+
+      xit "returns the return value of the blotter_model's blotter_method" do
+        mock(page).active_giveaway { 'ponies' }
+        Blotter::View.new(page).should == 'ponies'
       end
     end
   end
