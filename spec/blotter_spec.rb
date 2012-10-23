@@ -7,11 +7,11 @@ describe Blotter do
   before do
     Blotter.register_blotter_model(FacebookPage)
     Blotter.register_blotter_method(:active_giveaway)
-    Blotter.blotter_model.stub(:columns).and_return([
+    stub(Blotter.blotter_model).columns {[
       OpenStruct.new(type: :string, name: 'pid'),
       OpenStruct.new(type: :integer, name: 'id'),
       OpenStruct.new(type: :boolean, name: 'page_id')
-    ])
+    ]}
   end
 
   let(:request) {
@@ -49,7 +49,7 @@ describe Blotter do
   describe ".new" do
 
     it "acts as an alias for Blotter::Core.new" do
-      Blotter::Core.should_receive(:new).with(request)
+      mock(Blotter::Core).new(request)
       Blotter.new(request)
     end
   end
@@ -83,30 +83,28 @@ describe Blotter do
 
     describe "#page" do
 
-      it "calls Blotter::Page.new with the page id from the signed request" do
-
+      before do
+        any_instance_of(Blotter::Core, :payload => {
+          'page' => { 'id' => '7' }
+        })
       end
 
-      it "returns an instance of Blotter::Page" do
-
+      it "calls Blotter::Page.new with the page id from the signed request" do
+        mock(Blotter::Page).new('7') { 'facebook page resource' }
+        blotter_instance.page.should == 'facebook page resource'
       end
     end
 
     describe "#visitor" do
 
-      let(:fake_visitor_data) {
-        {
+      before do
+        any_instance_of(Blotter::Core, :payload => {
           'user' => { 'data' => 'fake visitor data' },
           'user_id' => '808283'
-        }
-      }
-
-      before do
-        blotter_instance.stub(:payload).and_return fake_visitor_data
+        })
       end
 
       it "returns visitor data from the parsed signed request" do
-        blotter_instance.should_receive(:payload)
         blotter_instance.visitor.should == { 'data' => 'fake visitor data',
                                              'uid' => '808283' }
       end
@@ -122,7 +120,7 @@ describe Blotter do
     describe "#payload" do
 
       it "memoizes the parsed signed request" do
-        blotter_instance.should_receive(:parsed_request)
+        mock(blotter_instance).parsed_request
         blotter_instance.payload
       end
     end
@@ -155,12 +153,12 @@ describe Blotter do
 
   describe Blotter::Art do
 
-    let(:page) { mock 'Blotter::Page' }
-    let(:visitor) { mock 'Blotter::Visitor' }
+    let(:page) { 'Blotter::Page' }
+    let(:visitor) { 'Blotter::Visitor' }
 
     before do
-      page.stub(:is_a?).and_return true
-      visitor.stub(:is_a?).and_return true
+      stub(page).is_a? { true }
+      stub(visitor).is_a? { true }
     end
 
     describe "#initialize" do
