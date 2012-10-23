@@ -17,22 +17,31 @@ describe Blotter do
   let(:request) {
 
     OpenStruct.new(
-      method: "POST",
-      ip: "127.0.0.1",
+      method: 'POST',
+      ip: '127.0.0.1',
       env: {
-        "HTTP_ORIGIN" => "http://apps.facebook.com"
+        'HTTP_ORIGIN' => 'http://apps.facebook.com'
       },
-      referrer: "http://apps.facebook.com/_sg_dev/?fb_source=search&ref=ts&fref=ts",
+      referrer: 'http://apps.facebook.com/_sg_dev/?fb_source=search&ref=ts&fref=ts',
       params: {
-        "signed_request" => "gibberish",
-        "fb_source" => "search",
-        "ref" => "ts",
-        "fref" => "ts",
-        "controller" => "blotter",
-        "action" => "index"
+        'signed_request' => 'gibberish',
+        'fb_source' => 'search',
+        'ref' => 'ts',
+        'fref' => 'ts',
+        'controller' => 'blotter',
+        'action' => 'index'
       },
-      cookies: OpenStruct.new(signed: { "_blotter_000_1234_999" => {
-
+      cookies: OpenStruct.new(signed: { '_blotter_000_1234_999' => {
+        'visitor' => {
+          'visit_count' => 7,
+          'first_visit' => 2.weeks.ago,
+          'last_visit' => 2.days.ago,
+          'is_page_fan' => false,
+          'is_app_user' => false,
+          'became_page_fan' => false,
+          'became_app_user' => false,
+          'referred_by_ids' => []
+        }
       }}),
       session: nil
     )
@@ -51,18 +60,18 @@ describe Blotter do
   describe Blotter::Core do
 
     let(:bad_source_request) {
-      request.clone.tap { |r| r.env["HTTP_ORIGIN"] = "http://apps.twitter.com" }
+      request.clone.tap { |r| r.env['HTTP_ORIGIN'] = 'http://apps.twitter.com' }
     }
 
     let(:bad_params_request) {
-      request.clone.tap { |r| r.params.delete("signed_request") }
+      request.clone.tap { |r| r.params.delete('signed_request') }
     }
 
     describe "#initialize" do
 
       it "takes a request object as a required argument" do
         expect { Blotter::Core.new }.to raise_error ArgumentError
-        expect { Blotter::Core.new({ wrong: "type" }) }.to raise_error ArgumentError
+        expect { Blotter::Core.new({ wrong: 'type' }) }.to raise_error ArgumentError
         expect { Blotter::Core.new(request) }.to_not raise_error
       end
 
@@ -85,7 +94,7 @@ describe Blotter do
 
     describe "#view" do
 
-      let(:page_resource) { FacebookPage.new(name: "cia") }
+      let(:page_resource) { FacebookPage.new(name: 'cia') }
       let(:blotter_view_instance) { OpenStruct.new(resource: 1) }
 
       before do
@@ -146,15 +155,24 @@ describe Blotter do
 
       let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
 
-      it "calls Blotter::Cookie.new with request cookies" do
+      before do
+
+        mock(blotter_instance).page { 'page_resource' }
+        mock(blotter_instance).view { 'view_resource' }
         mock(request).cookies { 'request_cookies' }
-        mock(Blotter::Cookie).new('request_cookies') { blotter_cookie_instance }
+
+        mock(Blotter::Cookie).new({
+          request_cookies: 'request_cookies',
+          page_resource: 'page_resource',
+          view_resource: 'view_resource'
+        }) { blotter_cookie_instance }
+      end
+
+      it "calls Blotter::Cookie.new with request cookies" do
         blotter_instance.outbound_cookie
       end
 
       it "returns the value of Blotter::Cookie#outbound" do
-        mock(request).cookies { 'request_cookies' }
-        mock(Blotter::Cookie).new('request_cookies') { blotter_cookie_instance }
         blotter_instance.outbound_cookie.should == 4
       end
     end
@@ -162,7 +180,7 @@ describe Blotter do
     describe "#referral_type" do
 
       it "returns a string describing the nature of the referral" do
-        blotter_instance.referral_type.should == "search"
+        blotter_instance.referral_type.should == 'search'
       end
     end
 

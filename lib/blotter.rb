@@ -2,18 +2,22 @@ require_relative 'blotter/version'
 
 module Blotter
 
-  class << self; attr_accessor :blotter_model, :blotter_method; end
+  class << self
 
-  def self.new(request)
-    Blotter::Core.new(request)
-  end
+    attr_accessor :blotter_model, :blotter_method
+    attr_accessor :app_id, :app_secret
 
-  def self.register_blotter_model(blotter_model)
-    @blotter_model = blotter_model
-  end
+    def new(request)
+      Blotter::Core.new(request)
+    end
 
-  def self.register_blotter_method(blotter_method)
-    @blotter_method = blotter_method
+    def register_blotter_model(blotter_model)
+      @blotter_model = blotter_model
+    end
+
+    def register_blotter_method(blotter_method)
+      @blotter_method = blotter_method
+    end
   end
 
   class Core
@@ -184,7 +188,6 @@ module Blotter
       cookie_value['visitor']['visit_count'] = visitor_visit_count
       cookie_value['visitor']['first_visit'] = visitor_first_visit
       cookie_value['visitor']['last_visit'] = visitor_last_visit
-      cookie_value['visitor']['this_visit'] = visitor_this_visit
 
       cookie_value['visitor']['is_page_fan'] = visitor_is_page_fan?
       cookie_value['visitor']['is_app_user'] = visitor_is_app_user?
@@ -203,10 +206,6 @@ module Blotter
     end
 
     def visitor_last_visit
-      @inbound
-    end
-
-    def visitor_this_visit
       @inbound
     end
 
