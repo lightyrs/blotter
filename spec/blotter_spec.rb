@@ -51,6 +51,8 @@ describe Blotter do
     )
   }
 
+  let(:mock_payload) { { 'page' => { 'id' => '7' } } }
+
   let(:blotter_instance) { Blotter.new(request) }
 
   describe ".new" do
@@ -117,9 +119,7 @@ describe Blotter do
       let(:blotter_view_instance) { OpenStruct.new(resource: 1) }
 
       before do
-        any_instance_of(Blotter::Core, payload: {
-          'page' => { 'id' => '7' }
-        })
+        any_instance_of(Blotter::Core, payload: mock_payload)
         any_instance_of(Blotter::Page, resource: page_resource)
       end
 
@@ -139,9 +139,7 @@ describe Blotter do
       let(:blotter_page_instance) { OpenStruct.new(resource: 2) }
 
       before do
-        any_instance_of(Blotter::Core, payload: {
-          'page' => { 'id' => '7' }
-        })
+        any_instance_of(Blotter::Core, payload: mock_payload)
       end
 
       it "calls Blotter::Page.new with the page id from the signed request" do
@@ -157,16 +155,41 @@ describe Blotter do
 
     describe "#visitor" do
 
+      let(:signed_request) { request.params['signed_request'] }
+      let(:inbound_cookie) { request.cookies.signed['_blotter_000_1234_999'] }
+
+      let(:blotter_visitor_instance) {
+
+        OpenStruct.new( facebook_uid: '808283',
+                        facebook_token: 'wxyz',
+                        is_page_fan: true,
+                        is_page_admin: false,
+                        is_app_user: false,
+                        became_page_fan: true,
+                        became_app_user: false,
+                        visit_count: 7,
+                        first_visit: 2.weeks.ago,
+                        last_visit: 2.days.ago,
+                        referred_by_ids: [] )
+      }
+
       before do
-        any_instance_of(Blotter::Core, payload: {
-          'user' => { 'data' => 'fake visitor data' },
-          'user_id' => '808283'
-        })
+        any_instance_of(Blotter::Core, payload: mock_payload)
+        mock(blotter_instance).inbound_cookie { inbound_cookie }
       end
 
-      it "returns visitor data from the parsed signed request" do
-        blotter_instance.visitor.should == { 'data' => 'fake visitor data',
-                                             'uid' => '808283' }
+      it "calls Blotter::Visitor.new with signed request and inbound cookie" do
+        mock(Blotter::Visitor).new(mock_payload, inbound_cookie) {
+          blotter_visitor_instance
+        }
+        blotter_instance.visitor
+      end
+
+      it "returns an instance of Blotter::Visitor" do
+        mock(Blotter::Visitor).new(mock_payload, inbound_cookie) {
+          blotter_visitor_instance
+        }
+        blotter_instance.visitor.should == blotter_visitor_instance
       end
     end
 

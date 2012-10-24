@@ -46,17 +46,15 @@ module Blotter
     end
 
     def visitor
-      visitor = payload['user']
-      visitor.merge!("uid" => payload['user_id']) if payload.has_key? 'user_id'
+      @visitor ||= Blotter::Visitor.new(payload, inbound_cookie)
+    end
+
+    def inbound_cookie
+      cookie.inbound
     end
 
     def outbound_cookie
-      @cookie ||= Blotter::Cookie.new(
-        request_cookies: @request.cookies,
-        page_resource: page,
-        view_resource: view
-      )
-      @cookie.outbound
+      cookie.outbound
     end
 
     def referral_type
@@ -72,6 +70,14 @@ module Blotter
     def parsed_request
       @oauth ||= Koala::Facebook::OAuth.new(Blotter.app_id, Blotter.app_secret)
       @oauth.parse_signed_request(@request.params['signed_request'])
+    end
+
+    def cookie
+      @cookie ||= Blotter::Cookie.new(
+        request_cookies: @request.cookies,
+        page_resource: page,
+        view_resource: view
+      )
     end
 
     def bad_request?
@@ -168,7 +174,15 @@ module Blotter
 
   class Visitor
 
-    def initialize
+    def initialize(payload, inbound_cookie)
+      @payload, @inbound_cookie = payload, inbound_cookie
+      raise ArgumentError if bad_args?
+    end
+
+    private
+
+    def bad_args?
+      true unless @payload.is_a? Hash and @payload.respond_to? 'user'
     end
   end
 
@@ -207,6 +221,7 @@ module Blotter
       cookie_value['visitor']['last_visit'] = visitor_last_visit
 
       cookie_value['visitor']['is_page_fan'] = visitor_is_page_fan?
+      cookie_value['visitor']['is_page_admin'] = visitor_is_page_admin?
       cookie_value['visitor']['is_app_user'] = visitor_is_app_user?
       cookie_value['visitor']['became_page_fan'] = visitor_became_page_fan?
       cookie_value['visitor']['became_app_user'] = visitor_became_app_user?
@@ -227,6 +242,10 @@ module Blotter
     end
 
     def visitor_is_page_fan?
+      @inbound
+    end
+
+    def visitor_is_page_admin?
       @inbound
     end
 
