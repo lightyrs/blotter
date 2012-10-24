@@ -162,8 +162,9 @@ module Blotter
 
     attr_accessor :cookie_key
 
-    def initialize(options = {})
-      @options = options
+    def initialize(args)
+      @options = args
+      raise ArgumentError if bad_args?
     end
 
     def inbound
@@ -227,6 +228,10 @@ module Blotter
 
     def visitor_referred_by_ids
       @inbound
+    end
+
+    def bad_args?
+      true unless @options.is_a? Hash
     end
   end
 end

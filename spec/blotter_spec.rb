@@ -42,7 +42,8 @@ describe Blotter do
           'became_app_user' => false,
           'referred_by_ids' => []
         }
-      }}),
+      },
+      'decoy_cookie' => 'bad' }),
       session: nil
     )
   }
@@ -168,7 +169,7 @@ describe Blotter do
         }) { blotter_cookie_instance }
       end
 
-      it "calls Blotter::Cookie.new with request cookies" do
+      it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
         blotter_instance.outbound_cookie
       end
 
@@ -196,6 +197,7 @@ describe Blotter do
   describe Blotter::View do
 
     let(:page) { FacebookPage.new }
+    let(:blotter_view_instance) { Blotter::View.new(page) }
 
     before do
       stub(page).is_a? { true }
@@ -206,11 +208,10 @@ describe Blotter do
       it "takes a Blotter::Page as a required argument" do
         expect { Blotter::View.new }.to raise_error ArgumentError
         expect { Blotter::View.new(request) }.to raise_error ArgumentError
-        expect { Blotter::View.new(page) }.to_not raise_error
+        expect { blotter_view_instance }.to_not raise_error
       end
 
       it "assigns the page argument to an instance variable" do
-        blotter_view_instance = Blotter::View.new(page)
         blotter_view_instance.instance_eval { @page }.should == page
       end
     end
@@ -219,7 +220,7 @@ describe Blotter do
 
       it "returns the return value of the blotter_model's blotter_method" do
         mock(page).active_giveaway { 'ponies' }
-        Blotter::View.new(page).resource.should == 'ponies'
+        blotter_view_instance.resource.should == 'ponies'
       end
     end
   end
@@ -227,17 +228,17 @@ describe Blotter do
   describe Blotter::Page do
 
     let(:pid) { '1234' }
+    let(:blotter_page_instance) { Blotter::Page.new(pid) }
 
     describe "#initialize" do
 
       it "takes a facebook page id as a required argument" do
         expect { Blotter::Page.new }.to raise_error ArgumentError
         expect { Blotter::Page.new(request) }.to raise_error ArgumentError
-        expect { Blotter::Page.new(pid) }.to_not raise_error
+        expect { blotter_page_instance }.to_not raise_error
       end
 
       it "assigns the facebook page id to an instance variable" do
-        blotter_page_instance = Blotter::Page.new(pid)
         blotter_page_instance.instance_eval { @pid }.should == pid
       end
     end
@@ -246,7 +247,7 @@ describe Blotter do
 
       it "returns an instance of the blotter model with the provided pid" do
         mock(FacebookPage).find_by_pid(1234) { 'ponies' }
-        Blotter::Page.new(pid).resource.should == 'ponies'
+        blotter_page_instance.resource.should == 'ponies'
       end
     end
   end
@@ -260,20 +261,36 @@ describe Blotter do
 
   describe Blotter::Cookie do
 
+    let(:args) { { cookies: 5, page: 6, view: 7 } }
+    let(:blotter_cookie_instance) { Blotter::Cookie.new(args) }
+
     describe "#initialize" do
 
+      it "takes a hash with cookies, page, and view as a required argument" do
+        expect { Blotter::Cookie.new }.to raise_error ArgumentError
+        expect { Blotter::Cookie.new("bad") }.to raise_error ArgumentError
+        expect { blotter_cookie_instance }.to_not raise_error
+      end
+
+      it "assigns the options hash to an instance variable" do
+        blotter_cookie_instance.instance_eval { @options }.should == args
+      end
     end
 
     describe "#inbound" do
 
+
+
+      it "extracts the relevant blotter cookie from the request cookies" do
+
+      end
     end
 
     describe "#outbound" do
 
-    end
+      it "modifies the inbound cookie to reflect the current context" do
 
-    describe "#cookie_key" do
-
+      end
     end
   end
 end
