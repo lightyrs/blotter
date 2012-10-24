@@ -4,19 +4,11 @@ module Blotter
 
   class << self
 
-    attr_accessor :blotter_model, :blotter_method
     attr_accessor :app_id, :app_secret
+    attr_accessor :blotter_model, :blotter_method
 
     def new(request)
       Blotter::Core.new(request)
-    end
-
-    def register_blotter_model(blotter_model)
-      @blotter_model = blotter_model
-    end
-
-    def register_blotter_method(blotter_method)
-      @blotter_method = blotter_method
     end
 
     def register_app_id(app_id)
@@ -25,6 +17,14 @@ module Blotter
 
     def register_app_secret(app_secret)
       @app_secret = app_secret
+    end
+
+    def register_blotter_model(blotter_model)
+      @blotter_model = blotter_model
+    end
+
+    def register_blotter_method(blotter_method)
+      @blotter_method = blotter_method
     end
   end
 
@@ -76,7 +76,8 @@ module Blotter
       @cookie ||= Blotter::Cookie.new(
         request_cookies: @request.cookies,
         page_resource: page,
-        view_resource: view
+        view_resource: view,
+        payload: payload
       )
     end
 

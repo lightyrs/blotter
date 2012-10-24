@@ -63,19 +63,19 @@ describe Blotter do
     end
   end
 
-  describe ".register_blotter_model" do
-
-  end
-
-  describe ".register_blotter_method" do
-
-  end
-
   describe ".register_app_id" do
 
   end
 
   describe ".register_app_secret" do
+
+  end
+
+  describe ".register_blotter_model" do
+
+  end
+
+  describe ".register_blotter_method" do
 
   end
 
@@ -193,54 +193,47 @@ describe Blotter do
       end
     end
 
-    describe "#inbound_cookie" do
-
-      let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
-
-      before do
-        mock(blotter_instance).page { 'page_resource' }
-        mock(blotter_instance).view { 'view_resource' }
-        mock(request).cookies { 'request_cookies' }
-
-        mock(Blotter::Cookie).new({
-          request_cookies: 'request_cookies',
-          page_resource: 'page_resource',
-          view_resource: 'view_resource'
-        }) { blotter_cookie_instance }
-      end
-
-      it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
-        blotter_instance.inbound_cookie
-      end
-
-      it "returns Blotter::Cookie#inbound" do
-        blotter_instance.inbound_cookie.should == 3
-      end
-    end
-
-    describe "#outbound_cookie" do
+    describe "cookie alias methods" do
 
       let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
 
       before do
 
+        any_instance_of(Blotter::Core, payload: mock_payload)
+
+        mock(request).cookies { 'request_cookies' }
         mock(blotter_instance).page { 'page_resource' }
         mock(blotter_instance).view { 'view_resource' }
-        mock(request).cookies { 'request_cookies' }
+        mock(blotter_instance).payload { 'payload' }
 
         mock(Blotter::Cookie).new({
           request_cookies: 'request_cookies',
           page_resource: 'page_resource',
-          view_resource: 'view_resource'
+          view_resource: 'view_resource',
+          payload: 'payload'
         }) { blotter_cookie_instance }
       end
 
-      it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
-        blotter_instance.outbound_cookie
+      describe "#inbound_cookie" do
+
+        it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
+          blotter_instance.inbound_cookie
+        end
+
+        it "returns Blotter::Cookie#inbound" do
+          blotter_instance.inbound_cookie.should == 3
+        end
       end
 
-      it "returns Blotter::Cookie#outbound" do
-        blotter_instance.outbound_cookie.should == 4
+      describe "#outbound_cookie" do
+
+        it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
+          blotter_instance.outbound_cookie
+        end
+
+        it "returns Blotter::Cookie#outbound" do
+          blotter_instance.outbound_cookie.should == 4
+        end
       end
     end
 
