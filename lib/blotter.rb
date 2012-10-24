@@ -28,7 +28,7 @@ module Blotter
     end
   end
 
-  class Core
+  class Blotter::Core
 
     def initialize(request)
       @request = request
@@ -103,7 +103,7 @@ module Blotter
     end
   end
 
-  class View
+  class Blotter::View
 
     def initialize(page)
       @page = page
@@ -125,7 +125,7 @@ module Blotter
     end
   end
 
-  class Page
+  class Blotter::Page
 
     attr_reader :pid
 
@@ -172,7 +172,7 @@ module Blotter
     end
   end
 
-  class Visitor
+  class Blotter::Visitor
 
     def initialize(payload, inbound_cookie)
       @payload, @inbound_cookie = payload, inbound_cookie
@@ -186,7 +186,7 @@ module Blotter
     end
   end
 
-  class Cookie
+  class Blotter::Cookie
 
     attr_accessor :cookie_key
 
