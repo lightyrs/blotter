@@ -219,18 +219,17 @@ module Blotter
 
     def outbound_cookie_value
 
-      cookie_value = { 'visitor' => {} }
-
-      cookie_value['visitor']['visit_count'] = visitor_visit_count
-      cookie_value['visitor']['first_visit'] = visitor_first_visit
-      cookie_value['visitor']['last_visit'] = visitor_last_visit
-
-      cookie_value['visitor']['is_page_fan'] = visitor_is_page_fan?
-      cookie_value['visitor']['is_app_user'] = visitor_is_app_user?
-      cookie_value['visitor']['became_page_fan'] = visitor_became_page_fan?
-      cookie_value['visitor']['became_app_user'] = visitor_became_app_user?
-
-      cookie_value['visitor']['referred_by_ids'] = visitor_referred_by_ids
+      cookie_value = {}
+      cookie_value['visitor'] = {
+        'visit_count' => visitor_visit_count,
+        'first_visit' => visitor_first_visit,
+        'last_visit' => visitor_last_visit,
+        'is_page_fan' => visitor_is_page_fan?,
+        'is_app_user' => visitor_is_app_user?,
+        'became_page_fan' => visitor_became_page_fan?,
+        'became_app_user' => visitor_became_app_user?,
+        'referred_by_ids' => visitor_referred_by_ids
+      }
 
       cookie_value
     end
@@ -256,11 +255,19 @@ module Blotter
     end
 
     def visitor_became_page_fan?
+      visitor_just_became_page_fan? or inbound['visitor']['became_page_fan']
+    end
+
+    def visitor_became_app_user?
+      visitor_just_became_app_user? or inbound['visitor']['became_app_user']
+    end
+
+    def visitor_just_became_page_fan?
       return false if initial?
       visitor_is_page_fan? and inbound['visitor']['is_page_fan'] == false
     end
 
-    def visitor_became_app_user?
+    def visitor_just_became_app_user?
       return false if initial?
       visitor_is_app_user? and inbound['visitor']['is_app_user'] == false
     end
