@@ -218,7 +218,7 @@ module Blotter
 
     def outbound_cookie_value
 
-      cookie_value = {}
+      cookie_value = { 'visitor' => {} }
 
       cookie_value['visitor']['visit_count'] = visitor_visit_count
       cookie_value['visitor']['first_visit'] = visitor_first_visit
@@ -231,6 +231,8 @@ module Blotter
       cookie_value['visitor']['became_app_user'] = visitor_became_app_user?
 
       cookie_value['visitor']['referred_by_ids'] = visitor_referred_by_ids
+
+      cookie_value
     end
 
     def visitor_visit_count
@@ -269,11 +271,11 @@ module Blotter
 
     def visitor_referred_by_ids
       return referred_by_ids if initial?
-      inbound['visitor']['referred_by_ids'].push(referred_by_ids)
+      inbound['visitor']['referred_by_ids'].push(referred_by_ids).compact
     end
 
     def referred_by_ids
-      
+
     end
 
     def bad_args?

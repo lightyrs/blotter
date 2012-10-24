@@ -330,7 +330,11 @@ describe Blotter do
 
     let(:args) { { request_cookies: request.cookies,
                    page_resource: OpenStruct.new(id: 1234),
-                   view_resource: OpenStruct.new(id: 999) } }
+                   view_resource: OpenStruct.new(id: 999),
+                   payload: {
+                     'page' => { 'has_liked' => true, 'admin' => false },
+                     'user_id' => '808283'
+                   } } }
 
     let(:blotter_cookie_instance) { Blotter::Cookie.new(args) }
 
@@ -358,7 +362,6 @@ describe Blotter do
     describe "#outbound" do
 
       it "returns Blotter::Cookie#outbound_cookie_value" do
-        mock(blotter_cookie_instance).outbound_cookie_value { 75 }
         blotter_cookie_instance.outbound.should == 75
       end
     end
