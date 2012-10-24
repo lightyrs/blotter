@@ -1,8 +1,9 @@
 require_relative 'rails/facebook_page' # mock application
 
 require 'ostruct'
-require 'simplecov'
+require 'timecop'
 require 'active_support/core_ext'
+require 'simplecov'
 
 SimpleCov.start
 

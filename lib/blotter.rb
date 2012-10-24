@@ -225,7 +225,6 @@ module Blotter
       cookie_value['visitor']['last_visit'] = visitor_last_visit
 
       cookie_value['visitor']['is_page_fan'] = visitor_is_page_fan?
-      cookie_value['visitor']['is_page_admin'] = visitor_is_page_admin?
       cookie_value['visitor']['is_app_user'] = visitor_is_app_user?
       cookie_value['visitor']['became_page_fan'] = visitor_became_page_fan?
       cookie_value['visitor']['became_app_user'] = visitor_became_app_user?
@@ -249,10 +248,6 @@ module Blotter
 
     def visitor_is_page_fan?
       @options[:payload]['page']['has_liked'] rescue false
-    end
-
-    def visitor_is_page_admin?
-      @options[:payload]['page']['admin'] rescue false
     end
 
     def visitor_is_app_user?

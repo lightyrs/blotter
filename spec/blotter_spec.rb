@@ -361,8 +361,27 @@ describe Blotter do
 
     describe "#outbound" do
 
+      before do
+        Timecop.freeze
+      end
+
+      after do
+        Timecop.return
+      end
+
       it "returns Blotter::Cookie#outbound_cookie_value" do
-        blotter_cookie_instance.outbound.should == 75
+        blotter_cookie_instance.outbound.should == {
+          'visitor' => {
+            'visit_count' => 8,
+            'first_visit' => 2.weeks.ago,
+            'last_visit' => Time.now,
+            'is_page_fan' => true,
+            'is_app_user' => true,
+            'became_page_fan' => true,
+            'became_app_user' => true,
+            'referred_by_ids' => []
+          }
+        }
       end
     end
   end
