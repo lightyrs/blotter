@@ -213,7 +213,7 @@ describe Blotter do
         blotter_instance.inbound_cookie
       end
 
-      it "returns the value of Blotter::Cookie#inbound" do
+      it "returns Blotter::Cookie#inbound" do
         blotter_instance.inbound_cookie.should == 3
       end
     end
@@ -239,7 +239,7 @@ describe Blotter do
         blotter_instance.outbound_cookie
       end
 
-      it "returns the value of Blotter::Cookie#outbound" do
+      it "returns Blotter::Cookie#outbound" do
         blotter_instance.outbound_cookie.should == 4
       end
     end
