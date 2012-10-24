@@ -18,6 +18,14 @@ module Blotter
     def register_blotter_method(blotter_method)
       @blotter_method = blotter_method
     end
+
+    def register_app_id(app_id)
+      @app_id = app_id
+    end
+
+    def register_app_secret(app_secret)
+      @app_secret = app_secret
+    end
   end
 
   class Core
@@ -168,6 +176,7 @@ module Blotter
     end
 
     def inbound
+      puts @options[:request_cookies].signed
       @inbound ||= @options[:request_cookies].signed[cookie_key]
     end
 
@@ -178,8 +187,10 @@ module Blotter
     private
 
     def cookie_key
-      @cookie_key ||= "_blotter_#{Blotter.app_id}_#{options[:page_resource]
-      .id}_#{options[:view_resource].id}"
+      app_id = Blotter.app_id
+      page_id = @options[:page_resource].id
+      view_id = @options[:view_resource].id
+      @cookie_key ||= "_blotter_#{app_id}_#{page_id}_#{view_id}"
     end
 
     def outbound_cookie_value

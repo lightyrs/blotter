@@ -4,6 +4,9 @@ describe Blotter do
 
   before do
 
+    Blotter.register_app_id('000')
+    Blotter.register_app_secret('wxyz')
+
     Blotter.register_blotter_model(FacebookPage)
     Blotter.register_blotter_method(:active_giveaway)
 
@@ -261,7 +264,10 @@ describe Blotter do
 
   describe Blotter::Cookie do
 
-    let(:args) { { cookies: 5, page: 6, view: 7 } }
+    let(:args) { { request_cookies: request.cookies,
+                   page_resource: OpenStruct.new(id: 1234),
+                   view_resource: OpenStruct.new(id: 999) } }
+
     let(:blotter_cookie_instance) { Blotter::Cookie.new(args) }
 
     describe "#initialize" do
@@ -278,11 +284,9 @@ describe Blotter do
     end
 
     describe "#inbound" do
-
-
-
       it "extracts the relevant blotter cookie from the request cookies" do
-
+        blotter_cookie_instance.inbound.should == request.cookies
+        .signed['_blotter_000_1234_999']
       end
     end
 
