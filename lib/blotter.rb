@@ -205,6 +205,10 @@ module Blotter
 
     private
 
+    def initial?
+      inbound.nil?
+    end
+
     def cookie_key
       app_id = Blotter.app_id
       page_id = @options[:page_resource].id
@@ -230,39 +234,46 @@ module Blotter
     end
 
     def visitor_visit_count
-      @inbound
+      initial? ? 1 : inbound['visitor']['visit_count'] + 1
     end
 
     def visitor_first_visit
-      @inbound
+      initial? ? Time.now : inbound['visitor']['first_visit']
     end
 
     def visitor_last_visit
-      @inbound
+      Time.now
     end
 
     def visitor_is_page_fan?
-      @inbound
+      @options[:payload]['page']['has_liked'] rescue false
     end
 
     def visitor_is_page_admin?
-      @inbound
+      @options[:payload]['page']['admin'] rescue false
     end
 
     def visitor_is_app_user?
-      @inbound
+      @options[:payload].has_key? 'user_id' rescue false
     end
 
     def visitor_became_page_fan?
-      @inbound
+      return false if initial?
+      visitor_is_page_fan? and inbound['visitor']['is_page_fan'] == false
     end
 
     def visitor_became_app_user?
-      @inbound
+      return false if initial?
+      visitor_is_app_user? and inbound['visitor']['is_app_user'] == false
     end
 
     def visitor_referred_by_ids
-      @inbound
+      return referred_by_ids if initial?
+      inbound['visitor']['referred_by_ids'].push(referred_by_ids)
+    end
+
+    def referred_by_ids
+      
     end
 
     def bad_args?

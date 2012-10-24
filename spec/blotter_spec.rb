@@ -254,8 +254,9 @@ describe Blotter do
     describe "#payload" do
 
       it "memoizes the parsed signed request" do
-        mock(blotter_instance).parsed_request
+        mock(blotter_instance).parsed_request { 2 }
         blotter_instance.payload
+        blotter_instance.instance_eval { @parsed_request }.should == 2
       end
     end
   end
@@ -356,8 +357,9 @@ describe Blotter do
 
     describe "#outbound" do
 
-      it "modifies the inbound cookie to reflect the current context" do
-
+      it "returns Blotter::Cookie#outbound_cookie_value" do
+        mock(blotter_cookie_instance).outbound_cookie_value { 75 }
+        blotter_cookie_instance.outbound.should == 75
       end
     end
   end
