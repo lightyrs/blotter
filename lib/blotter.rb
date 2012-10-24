@@ -79,15 +79,21 @@ module Blotter
     end
 
     def expected_object?
-      @request.respond_to? 'params'
+      @request.respond_to?('params')
+    rescue NoMethodError
+      false
     end
 
     def expected_source?
-      @request.env && @request.env['HTTP_ORIGIN'].match(/facebook\.com$/)
+      @request.env && @request.env['HTTP_ORIGIN'].include?('facebook.com')
+    rescue NoMethodError
+      false
     end
 
     def expected_params?
       @request.params['signed_request'].length > 0
+    rescue NoMethodError
+      false
     end
   end
 
@@ -176,7 +182,6 @@ module Blotter
     end
 
     def inbound
-      puts @options[:request_cookies].signed
       @inbound ||= @options[:request_cookies].signed[cookie_key]
     end
 

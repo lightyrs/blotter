@@ -61,6 +61,22 @@ describe Blotter do
     end
   end
 
+  describe ".register_blotter_model" do
+
+  end
+
+  describe ".register_blotter_method" do
+
+  end
+
+  describe ".register_app_id" do
+
+  end
+
+  describe ".register_app_secret" do
+
+  end
+
   describe Blotter::Core do
 
     let(:bad_source_request) {
@@ -75,24 +91,23 @@ describe Blotter do
 
       it "takes a request object as a required argument" do
         expect { Blotter::Core.new }.to raise_error ArgumentError
-        expect { Blotter::Core.new({ wrong: 'type' }) }.to raise_error ArgumentError
-        expect { Blotter::Core.new(request) }.to_not raise_error
+        expect { Blotter::Core.new(wrong: 'type') }.to raise_error ArgumentError
+        expect { blotter_instance }.to_not raise_error
       end
 
       it "assigns the request argument to an instance variable" do
-        Blotter::Core.new(request).instance_eval { @request }.should == request
+        blotter_instance.instance_eval { @request }.should == request
+        expect { blotter_instance }.to_not raise_error
       end
 
       it "raises an error if the request did not originate from facebook.com" do
         expect { Blotter::Core.new(bad_source_request) }.to raise_error
         ArgumentError
-        expect { Blotter::Core.new(request).to_not raise_error }
       end
 
       it "raises an error if the request does not have a signed_request param" do
         expect { Blotter::Core.new(bad_params_request) }.to raise_error
         ArgumentError
-        expect { Blotter::Core.new(request).to_not raise_error }
       end
     end
 
