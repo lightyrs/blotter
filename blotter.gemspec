@@ -16,12 +16,12 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+  gem.add_runtime_dependency "activesupport", "~> 3.2.8"
+  gem.add_runtime_dependency "koala", "~> 1.5.0"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "timecop"
   gem.add_development_dependency "rr"
   gem.add_development_dependency "shoulda-matchers"
   gem.add_development_dependency "simplecov"
-  gem.add_dependency "activesupport"
-  gem.add_dependency "koala"
 end
