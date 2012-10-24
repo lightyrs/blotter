@@ -193,6 +193,31 @@ describe Blotter do
       end
     end
 
+    describe "#inbound_cookie" do
+
+      let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
+
+      before do
+        mock(blotter_instance).page { 'page_resource' }
+        mock(blotter_instance).view { 'view_resource' }
+        mock(request).cookies { 'request_cookies' }
+
+        mock(Blotter::Cookie).new({
+          request_cookies: 'request_cookies',
+          page_resource: 'page_resource',
+          view_resource: 'view_resource'
+        }) { blotter_cookie_instance }
+      end
+
+      it "calls Blotter::Cookie.new with cookies, page, and view arguments" do
+        blotter_instance.inbound_cookie
+      end
+
+      it "returns the value of Blotter::Cookie#inbound" do
+        blotter_instance.inbound_cookie.should == 3
+      end
+    end
+
     describe "#outbound_cookie" do
 
       let(:blotter_cookie_instance) { OpenStruct.new(inbound: 3, outbound: 4) }
