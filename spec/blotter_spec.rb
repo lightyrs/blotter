@@ -299,6 +299,7 @@ describe Blotter do
     end
 
     describe "#inbound" do
+      
       it "extracts the relevant blotter cookie from the request cookies" do
         blotter_cookie_instance.inbound.should == request.cookies
         .signed['_blotter_000_1234_999']
